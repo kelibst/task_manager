@@ -1,0 +1,24 @@
+{
+  "name": "task_manager",
+  "version": "1.0.0",
+  "description": "A basic task manager built with Node and MangoDb to get use to Node application building",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kelibst/task_manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kelibst/task_manager/issues"
+  },
+  "homepage": "https://github.com/kelibst/task_manager#readme",
+  "dependencies": {
+    "mongodb": "^4.4.1",
+    "mongoose": "^6.2.9"
+  }
+}
