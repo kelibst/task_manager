@@ -117,6 +117,9 @@ app.patch("/v1/tasks/:id", async (req, res) => {
   }
 
   try {
+    if (!updates.length) {
+      throw new Error("You did not pass a json body to your request");
+    }
     const task = await Task.findByIdAndUpdate(_id, req.body, {
       new: true,
       runValidators: true,
@@ -127,6 +130,34 @@ app.patch("/v1/tasks/:id", async (req, res) => {
     res.send(task);
   } catch (e) {
     res.status(400).send(e);
+  }
+});
+
+app.delete("/v1/users/:id", async (req, res) => {
+  const _id = req.params.id;
+
+  try {
+    const user = await User.findByIdAndDelete(_id);
+    if (!user) {
+      return res.status(404).send();
+    }
+    res.send(user);
+  } catch (e) {
+    res.status(500).send();
+  }
+});
+
+app.delete("/v1/tasks/:id", async (req, res) => {
+  const _id = req.params.id;
+
+  try {
+    const task = await Task.findByIdAndDelete(_id);
+    if (!task) {
+      return res.status(404).send();
+    }
+    res.send(task);
+  } catch (e) {
+    res.status(500).send();
   }
 });
 
