@@ -2,9 +2,10 @@
   "name": "task_manager",
   "version": "1.0.0",
   "description": "A basic task manager built with Node and MangoDb to get use to Node application building",
-  "main": "app.js",
+  "main": "/src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+   "start": "node src/index.js",
+   "dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,10 @@
   },
   "homepage": "https://github.com/kelibst/task_manager#readme",
   "dependencies": {
+    "express": "^4.17.3",
     "mongodb": "^4.4.1",
-    "mongoose": "^6.2.9"
+    "mongoose": "^6.2.9",
+    "nodemon": "^2.0.15",
+    "validator": "^13.7.0"
   }
 }
