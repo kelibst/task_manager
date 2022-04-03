@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,6 +41,14 @@ const userSchema = new mongoose.Schema({
       }
     },
   },
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
 });
 
 userSchema.statics.findByCredentials = async (email, password) => {
@@ -56,9 +65,16 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user;
 };
 
+userSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  const token = jwt.sign({ _id: user._id.toString() }, "thisismynewtoken");
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+};
+
 userSchema.pre("save", async function (next) {
   const user = this;
-  console.log("running middleware");
   if (user.isModified("password")) {
     user.password = await bcrypt.hash(user.password, 8);
   }
@@ -67,7 +83,6 @@ userSchema.pre("save", async function (next) {
 
 userSchema.pre("updateOne", async function (next) {
   this.options.runValidators = true;
-  console.log("running update middleware");
 
   next();
 });
