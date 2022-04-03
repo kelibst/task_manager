@@ -39,7 +39,7 @@ router.get("/v1/users/:id", async (req, res) => {
 router.patch("/v1/users/:id", async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
-  const allUpdates = ["name", "email", "password", "age"];
+  const allUpdates = ["name", "email", "age"];
   const isValidOp = updates.every((update) => allUpdates.includes(update));
 
   if (!isValidOp) {
@@ -50,18 +50,12 @@ router.patch("/v1/users/:id", async (req, res) => {
       );
   }
   try {
-    // const user = await User.findByIdAndUpdate(_id, req.body, {
-    // //   new: true,
-    // //   runValidators: true,
-    // // });
-
     const user = await User.findById(_id);
 
     if (!user) {
       return res.status(404).send("User was not found!");
     }
-
-    updates.forEach((update) => (user[update] = req.body[update]));
+    await user.updateOne(req.body);
     res.send(user);
   } catch (e) {
     res.status(400).send(e);
@@ -79,6 +73,18 @@ router.delete("/v1/users/:id", async (req, res) => {
     res.send(user);
   } catch (e) {
     res.status(500).send();
+  }
+});
+
+router.post("/v1/users/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    res.send(user);
+  } catch (error) {
+    res.status(400).send(error);
   }
 });
 

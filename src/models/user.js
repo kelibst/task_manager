@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const validator = require("validator");
 
@@ -10,6 +11,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
     trim: true,
     lowercase: true,
     validate(value) {
@@ -39,9 +41,34 @@ const userSchema = new mongoose.Schema({
     },
   },
 });
+
+userSchema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("Unable to find user");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    throw new Error("Unable to login");
+  }
+  return user;
+};
+
 userSchema.pre("save", async function (next) {
   const user = this;
-  console.log("right before saving");
+  console.log("running middleware");
+  if (user.isModified("password")) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+
+userSchema.pre("updateOne", async function (next) {
+  this.options.runValidators = true;
+  console.log("running update middleware");
+
   next();
 });
 
