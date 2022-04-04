@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("../db/middlewares/auth");
 const User = require("../models/user");
 const router = new express.Router();
 
@@ -14,13 +15,31 @@ router.post("/v1/users", async (req, res) => {
   }
 });
 
-router.get("/v1/users", async (req, res) => {
+router.post("/v1/users/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = await user.generateAuthToken();
+
+    res.send({ user, token });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.get("/v1/users", auth, async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
   } catch (e) {
     res.status(400).send(e);
   }
+});
+
+router.get("/v1/users/me", auth, async (req, res) => {
+  res.send(req.user);
 });
 
 router.get("/v1/users/:id", async (req, res) => {
@@ -74,20 +93,6 @@ router.delete("/v1/users/:id", async (req, res) => {
     res.send(user);
   } catch (e) {
     res.status(500).send();
-  }
-});
-
-router.post("/v1/users/login", async (req, res) => {
-  try {
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password
-    );
-    const token = await user.generateAuthToken();
-
-    res.send({ user, token });
-  } catch (error) {
-    res.status(400).send(error);
   }
 });
 
